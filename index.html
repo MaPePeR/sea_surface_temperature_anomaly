@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sea Surface Temperature Anomaly</title>
+    <style type="text/css">
+        .container {
+            width: 1000px;
+            margin: auto
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #myplot {
+            width: 1000px;
+            height: 600px;
+        }
+        #myplot:empty {
+            border: 1px solid gray;
+        }
+        #myplot:empty::before {
+            content: "Loading...";
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sea Surface Temperature Anomaly</h1>
+        <h2>from 1982-2011 mean</h2>
+        <select id="location_select">
+            <option value="natlan1">North Atlantic</option>
+            <option value="world2">World (60S-60N)</option>
+        </select>
+        Dataset: NOAA OISST V2.1 | <a href="https://climatereanalyzer.org/clim/sst_daily/">ClimateReanalyzer.org</a>, Climate Change Institute, University of Maine
+        <div id="myplot"></div>
+        <p>This page uses data from <a href="https://climatereanalyzer.org">Climate Reanalyzer</a> which content is licensed under a <a href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">Creative Commons Attribution-NonCommercial 4.0 International License</a>.</p>
+        <p>Inspired by <a href="https://twitter.com/EliotJacobson/status/1667571728984461312" target="_blank">this tweet</a> by <a href="https://twitter.com/EliotJacobson" target="_blank">@EliotJacobson</a></p>
+    </div>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
