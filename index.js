@@ -103,11 +103,20 @@ function createPlot(data) {
                 stroke: '#000000',
                 strokeWidth: 1,
             }),
-            [plus, minus].map(d => Plot.lineY(d.data, {
-                stroke: '#000000',
-                strokeWidth: 1,
-                strokeDasharray: [3,3],
-            })),
+            [plus, minus].map(d => [
+                Plot.lineY(d.data, {
+                    stroke: '#000000',
+                    strokeWidth: 1,
+                    strokeDasharray: [3,3],
+                }),
+                Plot.text(d.data, Plot.selectFirst({
+                    text: _ => d.name,
+                    x: (y,x) => x, y: y => y,
+                    lineAnchor: 'top',
+                    textAnchor: 'start',
+                    dy: 6,
+                }))
+            ]),
         ],
       })
  
