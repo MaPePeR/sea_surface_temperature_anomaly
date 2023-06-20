@@ -61,17 +61,11 @@ function createPlot(data) {
     subtractMean(plus.data)
     subtractMean(minus.data)
 
-    const firstUnkownValue = years[years.length - 1].data.length
-    const preliminaryData = new Array(firstUnkownValue)
-    if (firstUnkownValue > PRELIMINARY_COUNT) {
-        for (let i = 1; i <= PRELIMINARY_COUNT; i++) {
-            preliminaryData[firstUnkownValue - i] = years[years.length - 1].data[firstUnkownValue - i]
-            years[years.length - 1].data[firstUnkownValue - i] = null
-            firstUnkownValue
-        }
-        preliminaryData[firstUnkownValue - PRELIMINARY_COUNT - 1] = years[years.length - 1].data[firstUnkownValue - PRELIMINARY_COUNT - 1]
+    if (years[years.length - 1].data.length > PRELIMINARY_COUNT) {
+        years[years.length - 1].preliminaryIndex =  years[years.length - 1].data.length - PRELIMINARY_COUNT
     } else {
-        // TODO
+        years[years.length - 1].preliminaryIndex = 0
+        years[years.length - 2].preliminaryIndex = years[years.length - 2].data.length + years[years.length - 1].data.length - PRELIMINARY_COUNT
     }
     const plot = Plot.plot({
         width: 1000,
@@ -88,9 +82,14 @@ function createPlot(data) {
             Plot.ruleY([0], {strokeWidth: 2}),
             years.map((d) => Plot.lineY(d.data, {
                 stroke: d.stroke || '#909090',
-                strokeWidth: d.strokeWidth || 0.5,
+                strokeWidth: (y,x,arr) => {
+                    if (d.preliminaryIndex !== undefined && x >= d.preliminaryIndex) {
+                        return 1;
+                    }
+                    return d.strokeWidth || 0.5;
+                },
             })),
-            [years[years.length - 2], {data:preliminaryData, name: years[years.length - 1].name}].map(
+            years.slice(-2).map(
                 d => Plot.text(d.data, Plot.selectLast({
                     text: _ => d.name,
                     x: (y,x) => x, y: y => y,
@@ -99,10 +98,6 @@ function createPlot(data) {
                     lineAnchor: 'bottom',
                 }))
             ),
-            Plot.lineY(preliminaryData, {
-                stroke: '#000000',
-                strokeWidth: 1,
-            }),
             [plus, minus].map(d => [
                 Plot.lineY(d.data, {
                     stroke: '#000000',
