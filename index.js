@@ -75,7 +75,7 @@ function createPlot(data) {
         },
         y: {
             grid: true,
-            label: "↑ Temperature (°C)",
+            label: "↑ Temperature Difference (°C)",
             domain: [Math.min(-maxVal, minVal) * 1.1, Math.max(-minVal, maxVal) * 1.1],
         },
         marks: [
