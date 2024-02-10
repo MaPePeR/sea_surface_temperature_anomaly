@@ -25,10 +25,10 @@ function createPlot(data) {
     if (mean.name !== "1982-2011 mean")
         throw "Unexpected row"
     const plus = data[data.length - 2]
-    if (plus.name !== "plus 2σ")
+    if (plus.name !== "plus 2\u03c3")
         throw "unexpected plus row"
     const minus = data[data.length - 1]
-    if (minus.name !== "minus 2σ")
+    if (minus.name !== "minus 2\u03c3")
         throw "unexpected minus row"
     function subtractMean(d) {
         for (let i = 0; i < d.length; i++) {
@@ -36,6 +36,16 @@ function createPlot(data) {
                 d[i] -= mean.data[i];
             }
         }
+    }
+    function copyMultiply(d, newname, multiply) {
+        const c = {
+            name: newname,
+            data: new Array(d.data.length),
+        };
+        for (let i = 0; i < d.data.length; i++) {
+            c.data[i] = multiply * d.data[i];
+        }
+        return c;
     }
     let minVal = Infinity, maxVal = -Infinity
     years.forEach(el => {
@@ -81,6 +91,8 @@ function createPlot(data) {
     }
     subtractMean(plus.data)
     subtractMean(minus.data)
+    const plus2 = copyMultiply(plus, "plus 4\u03c3", 2);
+    const minus2 = copyMultiply(minus, "minus 4\u03c3", 2);
 
     if (years[years.length - 1].data.length > PRELIMINARY_COUNT) {
         years[years.length - 1].preliminaryIndex =  years[years.length - 1].data.length - PRELIMINARY_COUNT
@@ -120,7 +132,7 @@ function createPlot(data) {
                     textAnchor: 'start',
                 }))
             ),
-            [plus, minus].map(d => [
+            [plus, plus2, minus, minus2].map(d => [
                 Plot.lineY(d.data, {
                     stroke: '#000000',
                     strokeWidth: 1,
