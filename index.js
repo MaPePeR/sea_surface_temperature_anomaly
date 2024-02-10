@@ -54,10 +54,31 @@ function createPlot(data) {
             }
         }
     });
-    years[years.length - 2].stroke = '#FF8000'
-    years[years.length - 2].strokeWidth = 2
     years[years.length - 1].stroke = '#000000'
     years[years.length - 1].strokeWidth = 3
+    // Matplotlib tab20c
+    // Source: https://github.com/matplotlib/matplotlib/blob/d2cc4d0b0a2e1e9e8a5c1f311f0e10ef8acdb9ef/lib/matplotlib/_cm.py#L1345-L1366
+    // Which took it from https://github.com/vega/vega/wiki/Scales
+    // https://vega.github.io/vega/docs/schemes/#category20c
+    // BSD 3-Clause "New" or "Revised" License
+    //
+    const tab20c = [
+        '#3182bd', '#6baed6', '#9ecae1', '#c6dbef',
+        '#e6550d', '#fd8d3c', '#fdae6b', '#fdd0a2',
+        '#31a354', '#74c476', '#a1d99b', '#c7e9c0',
+        '#756bb1', '#9e9ac8', '#bcbddc', '#dadaeb',
+        '#636363', '#969696', '#bdbdbd', '#d9d9d9',
+    ];
+    // End of tab20c
+    const marks = [years.length - 1];
+    for (let i = 0; i < tab20c.length; ++i) {
+        if (years.length - 2 - i < 0) break;
+        years[years.length - 2 - i].stroke = tab20c[i];
+        years[years.length - 2 - i].strokeWidth = 2;
+        if (i % 4 == 0) {
+            marks.push(years.length - 2 - i);
+        }
+    }
     subtractMean(plus.data)
     subtractMean(minus.data)
 
@@ -89,13 +110,14 @@ function createPlot(data) {
                     return d.strokeWidth || 0.5;
                 },
             })),
-            years.slice(-2).map(
+            marks.map(yearindex => years[yearindex]).map(
                 d => Plot.text(d.data, Plot.selectLast({
                     text: _ => d.name,
                     x: (y,x) => x, y: y => y,
                     fill: d.stroke,
                     dy: -6,
                     lineAnchor: 'bottom',
+                    textAnchor: 'start',
                 }))
             ),
             [plus, minus].map(d => [
