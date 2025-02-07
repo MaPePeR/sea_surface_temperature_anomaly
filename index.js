@@ -6,7 +6,7 @@ const locationSelect = document.getElementById('location_select')
 function loadData(location) {
     div.replaceChildren('')
     // fetch(`oisst2.1_${location}_sst_day.json`) //uncomment for local files
-    fetch(`https://climatereanalyzer.org/clim/sst_daily/json/oisst2.1_${location}_sst_day.json`)
+    fetch(`https://climatereanalyzer.org/clim/sst_daily/json_2clim/oisst2.1_${location}_sst_day.json`)
         .then((resonse) => resonse.json())
         .then(createPlot)
 }
@@ -19,17 +19,14 @@ loadData(locationSelect.value)
 const PRELIMINARY_COUNT = 14
 
 function createPlot(data) {
-    const years = data.filter((d) => (d.name !== "1982-2011 mean" && d.name.indexOf('σ') === -1))
+    const years = data.filter((d) => (d.name.indexOf('-') === -1 && d.name.indexOf('σ') === -1))
 
-    const mean = data[data.length - 3]
-    if (mean.name !== "1982-2011 mean")
+    const mean = data[data.length - 2]
+    if (mean.name !== "1982-2010")
         throw "Unexpected row"
-    const plus = data[data.length - 2]
-    if (plus.name !== "plus 2\u03c3")
-        throw "unexpected plus row"
-    const minus = data[data.length - 1]
-    if (minus.name !== "minus 2\u03c3")
-        throw "unexpected minus row"
+    if (mean.data[365] === null) {
+        mean.data[365] = mean.data[364]
+    }
     function subtractMean(d) {
         for (let i = 0; i < d.length; i++) {
             if (d[i] !== null) {
@@ -89,10 +86,6 @@ function createPlot(data) {
             marks.push(years.length - 2 - i);
         }
     }
-    subtractMean(plus.data)
-    subtractMean(minus.data)
-    const plus2 = copyMultiply(plus, "plus 4\u03c3", 2);
-    const minus2 = copyMultiply(minus, "minus 4\u03c3", 2);
 
     if (years[years.length - 1].data.length > PRELIMINARY_COUNT) {
         years[years.length - 1].preliminaryIndex =  years[years.length - 1].data.length - PRELIMINARY_COUNT
@@ -132,20 +125,6 @@ function createPlot(data) {
                     textAnchor: 'start',
                 }))
             ),
-            [plus, plus2, minus, minus2].map(d => [
-                Plot.lineY(d.data, {
-                    stroke: '#000000',
-                    strokeWidth: 1,
-                    strokeDasharray: [3,3],
-                }),
-                Plot.text(d.data, Plot.selectFirst({
-                    text: _ => d.name,
-                    x: (y,x) => x, y: y => y,
-                    lineAnchor: 'top',
-                    textAnchor: 'start',
-                    dy: 6,
-                }))
-            ]),
         ],
       })
  
